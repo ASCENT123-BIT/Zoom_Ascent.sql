@@ -67,7 +67,7 @@ This project uses **SQL (MySQL)** to clean and analyze trip data for **ZoomRide*
 - `Zoom_Ascent.sql` – All SQL queries (Q1 to Q10) with comments
 - `Zoom_Ascent_Answer_Sheet.txt` – Query outputs
 - `README.md` – Project documentation
-- 'Message_to_the_Manager.docx'
+-  Message_to_the_Manager.docx
 
 ## ✅ Conclusion
 This project shows an end-to-end SQL workflow: cleaning messy data (spelling errors, whitespace, duplicates), validating the fixes, and using joins and aggregations to answer business questions. It highlights Lagos as ZoomRide's main revenue source, the higher value of Comfort rides, and a clear group of top customers and inactive sign-ups to focus on.
