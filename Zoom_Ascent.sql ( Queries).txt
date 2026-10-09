@@ -1,0 +1,124 @@
+SELECT * FROM trips LIMIT 10;
+
+
+# Q1- How many rows are in the trips table?
+SELECT COUNT(*) FROM trips;
+
+
+# Q2- Show the 5 longest completed trips
+SELECT trip_id, city, distance_km, fare 
+FROM trips 
+WHERE status = 'completed' 
+ORDER BY distance_km DESC 
+LIMIT 5; 
+
+
+# Q3-  How many trips happened in each city?
+SELECT city, COUNT(*) AS trip_id FROM trips GROUP BY city;
+# The trips tables has duplicate trip_id for all the cities, Which could be from the messy data created during data entry as seen in the wrong spelling of the names of the cities, resulting in Sql intepreting the data as separates values giving us duplicate values.
+
+
+# Q4a- Find the duplicate trips?
+SELECT customer_id, driver_id, trip_date, fare,
+MIN(trip_id) AS trip_id_1,
+MAX(trip_id) AS trip_id_2,
+COUNT(*) AS duplicate_count
+FROM trips
+GROUP BY customer_id, driver_id, trip_date, fare
+HAVING COUNT(*) > 1;
+
+
+# Q4b-  How many Completed trips have a missing fare?
+SELECT COUNT(*) AS missing_fare 
+FROM trips 
+WHERE status = 'completed' AND fare is NULL;
+
+
+#Q5- Fix the data
+# Fixing of spellings of city names
+UPDATE trips SET city= 'Nairobi' WHERE city = 'Nairobbi'; 
+UPDATE trips SET city= 'Kampala' WHERE city = 'Kampla'; 
+UPDATE trips SET city= 'Port-Harcourt' WHERE city = 'PH'; 
+UPDATE trips SET city= 'Port-Harcourt' WHERE city = 'Port Harcourt'; 
+
+
+#Cleaning of excess spaces 
+UPDATE trips SET trip_id = TRIM(trip_id);
+UPDATE trips SET customer_id = TRIM(customer_id);
+UPDATE trips SET driver_id = TRIM(driver_id);
+UPDATE trips SET city = TRIM(city);
+UPDATE trips SET trip_date = TRIM(trip_date);
+UPDATE trips SET distance_km = TRIM(distance_km);
+UPDATE trips SET status = TRIM(status);
+UPDATE trips SET payment_method = TRIM(payment_method);
+
+SELECT * FROM trips;
+
+
+#Deleting of Duplicates
+DELETE FROM trips WHERE trip_id IN (299,300);
+
+
+# Proving the Query worked
+SELECT city, COUNT(*) AS trip_id FROM trips GROUP BY city;
+
+
+#Recounting the rows
+SELECT COUNT(*) FROM trips;
+
+
+
+#Q6- Revenue by City?
+SELECT city,
+COUNT(*) AS number_of_trips,
+SUM(fare) AS revenue, 
+ROUND(AVG(fare), 2) AS average_fare
+FROM trips
+WHERE status= 'Completed'
+GROUP BY city
+ORDER BY revenue DESC;
+
+
+#Q7-  Revenue by Month?
+SELECT
+DATE_FORMAT(trip_date, '%Y-%m') AS month,
+COUNT(*) AS number_of_trips,
+SUM(fare) AS revenue
+FROM trips
+WHERE status= 'Completed'
+GROUP BY Month
+ORDER BY revenue DESC;
+
+
+#Q8-  Revenue by Vehicle Type?
+SELECT drivers.vehicle_type,
+COUNT(*) AS number_of_trips,
+SUM(fare) AS revenue
+FROM trips
+INNER JOIN drivers ON trips.driver_id = drivers.driver_id
+WHERE trips.status= 'Completed'
+GROUP BY drivers.vehicle_type
+ORDER BY revenue DESC;
+
+
+#Q9- Which customers have never booked a trip?
+SELECT customers.customer_name,
+COUNT(trips.trip_id) AS number_of_trips
+FROM customers
+LEFT JOIN trips ON customers.customer_id = trips.customer_id
+WHERE trips.trip_id IS NULL
+GROUP BY customers.customer_name;
+
+
+#Q10- Who are the top 3 customers by total spend on Completed trips?
+SELECT customers.customer_name,
+COUNT(trips.trip_id) AS number_of_trips,
+SUM(fare) AS total_spend
+FROM customers
+LEFT JOIN trips ON customers.customer_id = trips.customer_id
+WHERE trips.status = 'Completed'
+GROUP BY customers.customer_name
+ORDER BY total_spend DESC
+LIMIT 3;
+
+
